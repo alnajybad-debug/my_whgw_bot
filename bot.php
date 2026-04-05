@@ -11,7 +11,7 @@ $chatId = $update["message"]["chat"]["id"];
 $message = $update["message"]["text"];
 
 // الرد على رسالة "مرحبا"
-if ($message == "/start") {
+if($message == "/start") {
     $url = $website."/sendMessage?chat_id=".$chatId."&text=".urlencode("أهلاً بك يا زميلي المبرمج! أنا بوتك الجديد.");
     file_get_contents($url);
 }
