@@ -24,7 +24,7 @@ if (isset($update["message"])) {
         } elseif ($text == "نشر") {
             $reply = "أهلاً يا بشمهندس، ماذا تريد أن تنشر؟";
         } else {
-            $reply = "لقد استلمت رسالتك يا هندسة: " . $text;
+            $reply = "لقد استلمت رسالتك يا مهندسة: " . $text;
         }
 
     } else {
