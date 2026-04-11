@@ -6,6 +6,17 @@ $website = "https://api.telegram.org/bot".$botToken;
 // 2. استقبال البيانات من تلجرام
 $content = file_get_contents("php://input");
 $update = json_decode($content, true);
+$callbackQuery = $update["callback_query"];
+if (isset($callbackQuery)) {
+    $callbackData = $callbackQuery["data"];
+    $callbackChatId = $callbackQuery["message"]["chat"]["id"];
+
+    if ($callbackData == "user_count") {
+        $allUsers = file('users.txt', FILE_IGNORE_NEW_LINES);
+        $count = count($allUsers);
+        file_get_contents($website."/sendMessage?chat_id=".$callbackChatId."&text=".urlencode("عدد المشتركين حالياً هو: $count"));
+    }
+}
 
 if (isset($update["message"])) {
     $chatId = $update["message"]["chat"]["id"];
@@ -20,7 +31,26 @@ if (isset($update["message"])) {
     if (in_array($chatId, $admins)) {
         
         if ($text == "/start") {
-            $reply = "أهلاً بك يا باشمهندس $name! أنا أعمل الآن من اليمن بكل كفاءة.";
+    $keyboard = [
+        'inline_keyboard' => [
+            [
+                ['text' => "📢 نشر رسالة", 'callback_data' => "publish_msg"],
+                ['text' => "💰 دعم بالنجوم", 'callback_data' => "support_stars"]
+            ],
+            [
+                ['text' => "📊 عدد المشتركين", 'callback_data' => "user_count"]
+            ]
+        ]
+    ];
+
+    $reply = "أهلاً بك يا باشمهندس في لوحة التحكم. اختر ما تريد القيام به:";
+    
+    // إرسال الرسالة مع الأزرار
+    $url = $website . "/sendMessage?chat_id=" . $chatId . "&text=" . urlencode($reply) . "&reply_markup=" . json_encode($keyboard);
+    file_get_contents($url);
+
+            //$reply = "أهلاً بك يا باشمهندس     //$name! أنا أعمل الآن من اليمن بكل كفاءة.";
+
         } elseif ($text == "نشر") {
             $reply = "أهلاً يا بشمهندس، ماذا تريد أن تنشر؟";
         } else {
