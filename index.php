@@ -49,7 +49,8 @@ if (isset($update["message"])) {
     $url = $website . "/sendMessage?chat_id=" . $chatId . "&text=" . urlencode($reply) . "&reply_markup=" . json_encode($keyboard);
     file_get_contents($url);
 
-            //$reply = "أهلاً بك يا باشمهندس     //$name! أنا أعمل الآن من اليمن بكل كفاءة.";
+   //$reply = "أهلاً بك يا باشمهندس    
+ //$name! أنا أعمل الآن من اليمن بكل كفاءة.";
 
         } elseif ($text == "نشر") {
             $reply = "أهلاً يا بشمهندس، ماذا تريد أن تنشر؟";
