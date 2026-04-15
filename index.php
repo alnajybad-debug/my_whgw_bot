@@ -1,24 +1,23 @@
 <?php
-// 1. إعدادات التوكن والموقع
+// 1. إعدادات التوكن
 $botToken = "8406108478:AAEaJPfFHN4u83_uX6je2pguLipWnTI-VnI"; 
 $website = "https://api.telegram.org/bot".$botToken;
 
-// 2. استقبال البيانات من تليجرام
+// 2. استقبال البيانات
 $content = file_get_contents("php://input");
 $update = json_decode($content, true);
 
-// 3. معالجة الرسائل النصية
 if (isset($update["message"])) {
     $chatId = (string)$update["message"]["chat"]["id"];
     $text = $update["message"]["text"];
     $name = $update["message"]["from"]["first_name"];
 
-    // قائمة الأدمن (تأكد أن رقمك هنا صحيح)
-    $admins = ["7785947020"]; 
+    // قائمة الأدمن - رقمك الصحيح
+    $admins = ["77649438459"]; 
 
     if (in_array($chatId, $admins)) {
         if ($text == "/start") {
-            // تنسيق الأزرار بدقة
+            // مصفوفة الأزرار بتنسيق هندسي دقيق
             $keyboard = [
                 'inline_keyboard' => [
                     [
@@ -31,34 +30,29 @@ if (isset($update["message"])) {
                 ]
             ];
 
-            $reply = "أهلاً بك يا باشمهندس " . $name . " ✅\nتم تفعيل لوحة التحكم الخاصة بك:";
+            $reply = "مرحباً مهندس الصقور الجارحه 🦅\nلوحة التحكم جاهزة الآن:";
             
-            // رابط الإرسال
-            $sendUrl = $website . "/sendMessage?chat_id=" . $chatId . "&text=" . urlencode($reply) . "&reply_markup=" . json_encode($keyboard);
-            file_get_contents($sendUrl);
+            // إرسال الطلب
+            $url = $website . "/sendMessage?chat_id=" . $chatId . "&text=" . urlencode($reply) . "&reply_markup=" . json_encode($keyboard);
+            file_get_contents($url);
             exit;
         } else {
-            // رد الأدمن على أي رسالة أخرى
-            $reply = "مرحباً مهندس " . $name . "، لقد استلمت رسالتك: " . $text;
-            file_get_contents($website . "/sendMessage?chat_id=" . $chatId . "&text=" . urlencode($reply));
+            // رد الأدمن على أي نص آخر
+            $msg = "مرحباً مهندس، لقد استلمت نصك: " . $text;
+            file_get_contents($website . "/sendMessage?chat_id=" . $chatId . "&text=" . urlencode($msg));
             exit;
         }
     } else {
         // رد المستخدم العادي
-        $reply = "عذراً يا " . $name . "، هذا البوت مخصص للمهندسين فقط.";
-        file_get_contents($website . "/sendMessage?chat_id=" . $chatId . "&text=" . urlencode($reply));
+        file_get_contents($website . "/sendMessage?chat_id=" . $chatId . "&text=" . urlencode("عذراً، هذا البوت خاص بالفريق فقط."));
         exit;
     }
 }
 
-// 4. معالجة ضغطات الأزرار (Callback)
+// معالجة الأزرار
 if (isset($update["callback_query"])) {
     $callbackChatId = $update["callback_query"]["message"]["chat"]["id"];
-    $data = $update["callback_query"]["data"];
-
-    if ($data == "user_count") {
-        file_get_contents($website . "/sendMessage?chat_id=" . $callbackChatId . "&text=" . urlencode("سيتم تفعيل ميزة الإحصائيات قريباً."));
-    }
+    file_get_contents($website . "/sendMessage?chat_id=" . $callbackChatId . "&text=" . urlencode("سيتم تفعيل هذا القسم قريباً."));
     exit;
 }
 ?>
