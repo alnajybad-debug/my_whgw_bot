@@ -34,18 +34,26 @@ if (isset($update["message"])) {
     // ضع رقم الـ ID الخاص بك هنا بدلاً من الصفر
     $admins = ["7785947020"]; 
 
-    if (in_array($chatId, $admins)) {
-        if ($text == "/start") {
+            if ($text == "/start") {
             $keyboard = [
                 'inline_keyboard' => [
-                    [['text' => "📢 نشر رسالة", 'callback_data' => "publish_msg"], ['text' => "💰 دعم بالنجوم", 'callback_data' => "support_stars"]],
-                    [['text' => "📊 عدد المشتركين", 'callback_data' => "user_count"]]
+                    [
+                        ['text' => "📢 نشر رسالة", 'callback_data' => "publish_msg"],
+                        ['text' => "📊 عدد المشتركين", 'callback_data' => "user_count"]
+                    ],
+                    [
+                        ['text' => "💰 دعم بالنجوم", 'callback_data' => "support_stars"]
+                    ]
                 ]
             ];
-            $msg = "أهلاً بك يا باشمهندس $name في لوحة التحكم:";
-            file_get_contents($website . "/sendMessage?chat_id=$chatId&text=".urlencode($msg)."&reply_markup=".json_encode($keyboard));
-            exit; // توقف هنا لضمان عدم إرسال أي رد آخر
-        } 
+
+            $reply = "أهلاً بك يا باشمهندس $name ✅\nتم تفعيل لوحة التحكم الخاصة بك:";
+            
+            $url = $website . "/sendMessage?chat_id=" . $chatId . "&text=" . urlencode($reply) . "&reply_markup=" . json_encode($keyboard);
+            file_get_contents($url);
+            exit; 
+        }
+
         
         // إذا كتب الأدمن أي شيء آخر غير /start
         file_get_contents($website."/sendMessage?chat_id=$chatId&text=".urlencode("مرحباً مهندس $name، لقد استلمت: $text"));
