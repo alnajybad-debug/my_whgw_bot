@@ -13,7 +13,7 @@ if (isset($update["message"])) {
     $name = $update["message"]["from"]["first_name"];
 
     // قائمة الأدمن - رقمك الصحيح
-    $admins = ["77649438459"]; 
+    $admins = ["7785947020"]; 
 
     if (in_array($chatId, $admins)) {
         if ($text == "/start") {
