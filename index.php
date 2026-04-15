@@ -1,43 +1,38 @@
 <?php
-// 1. إعداد التوكن
 $botToken = "8406108478:AAEaJPfFHN4u83_uX6je2pguLipWnTI-VnI"; 
 $website = "https://api.telegram.org/bot".$botToken;
 
-// 2. استقبال البيانات
 $content = file_get_contents("php://input");
 $update = json_decode($content, true);
 
-// إنشاء ملف المستخدمين إذا لم يكن موجوداً (لمنع توقف الكود)
 $file = 'users.txt';
 if (!file_exists($file)) { file_put_contents($file, ""); }
 
-// معالجة ضغطات الأزرار (Callback Query)
+// معالجة ضغطات الأزرار
 if (isset($update["callback_query"])) {
     $callbackData = $update["callback_query"]["data"];
     $callbackChatId = $update["callback_query"]["message"]["chat"]["id"];
-
     if ($callbackData == "user_count") {
         $allUsers = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         $count = count($allUsers);
         file_get_contents($website."/sendMessage?chat_id=".$callbackChatId."&text=".urlencode("📊 عدد المشتركين حالياً هو: $count"));
     }
-    exit; // إنهاء التنفيذ هنا عند معالجة الزر
+    exit;
 }
 
-// معالجة الرسائل النصية
 if (isset($update["message"])) {
-    $chatId = $update["message"]["chat"]["id"];
+    $chatId = (string)$update["message"]["chat"]["id"]; // تحويل إلى نص لضمان المطابقة
     $text = $update["message"]["text"];
     $name = $update["message"]["from"]["first_name"];
 
-    // حفظ المستخدم الجديد في الملف
+    // حفظ المستخدم
     $current_users = file_get_contents($file);
-    if (strpos($current_users, (string)$chatId) === false) {
+    if (strpos($current_users, $chatId) === false) {
         file_put_contents($file, $chatId . PHP_EOL, FILE_APPEND);
     }
 
-    // قائمة الأدمن (تأكد من وضع الـ ID الصحيح المكون من أرقام فقط بدون +)
-    $admins = ["7785947020"]; // راجع هذا الرقم، يجب أن يكون ID وليس رقم هاتف
+    // ضع رقم الـ ID الخاص بك هنا بدلاً من الصفر
+    $admins = ["7785947020"]; 
 
     if (in_array($chatId, $admins)) {
         if ($text == "/start") {
@@ -49,13 +44,16 @@ if (isset($update["message"])) {
             ];
             $msg = "أهلاً بك يا باشمهندس $name في لوحة التحكم:";
             file_get_contents($website . "/sendMessage?chat_id=$chatId&text=".urlencode($msg)."&reply_markup=".json_encode($keyboard));
-        } elseif ($text == "نشر") {
-            file_get_contents($website."/sendMessage?chat_id=$chatId&text=".urlencode("أهلاً يا بشمهندس، ماذا تريد أن تنشر؟"));
-        } else {
-            file_get_contents($website."/sendMessage?chat_id=$chatId&text=".urlencode("استلمت رسالتك: $text"));
+            exit; // توقف هنا لضمان عدم إرسال أي رد آخر
         } 
+        
+        // إذا كتب الأدمن أي شيء آخر غير /start
+        file_get_contents($website."/sendMessage?chat_id=$chatId&text=".urlencode("مرحباً مهندس $name، لقد استلمت: $text"));
+        exit;
     } else {
+        // الرد لغير الأدمن
         file_get_contents($website."/sendMessage?chat_id=$chatId&text=".urlencode("عذراً، هذا البوت مخصص لفريق المهندسين فقط."));
+        exit;
     }
 }
 ?>
