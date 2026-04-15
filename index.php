@@ -53,7 +53,7 @@ if (isset($update["message"])) {
             file_get_contents($website."/sendMessage?chat_id=$chatId&text=".urlencode("أهلاً يا بشمهندس، ماذا تريد أن تنشر؟"));
         } else {
             file_get_contents($website."/sendMessage?chat_id=$chatId&text=".urlencode("استلمت رسالتك: $text"));
-        }
+        } 
     } else {
         file_get_contents($website."/sendMessage?chat_id=$chatId&text=".urlencode("عذراً، هذا البوت مخصص لفريق المهندسين فقط."));
     }
