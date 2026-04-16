@@ -1,20 +1,21 @@
 <?php
-$botToken = "8406108478:AAEaJPfFHN4u83_uX6je2pguLipWnTI-VnI"; 
-$website = "https://api.telegram.org/bot".$botToken;
+$botToken = "8406108478:AAEaJPfFHN4u83_uX6je2pguLipWnTI-VnI";
 
 $content = file_get_contents("php://input");
 $update = json_decode($content, true);
 
 if (isset($update["message"])) {
-    $chatId = (string)$update["message"]["chat"]["id"];
-    $text = trim($update["message"]["text"]); // تنظيف النص من المسافات
+    $chatId = $update["message"]["chat"]["id"];
+    $text = trim($update["message"]["text"]);
     $name = $update["message"]["from"]["first_name"];
 
-    $admins = ["7785947020"]; 
+    // قائمة الأدمن
+    $admins = [7785947020]; 
 
     if (in_array($chatId, $admins)) {
-        // فحص إذا كان النص يحتوي على كلمة start
-        if (strpos($text, "/start") !== false) {
+        if ($text == "/start") {
+            $reply = "مرحباً مهندس الصقور الجارحه 🦅\nتم تحديث البروتوكول.. هل تظهر الأزرار الآن؟";
+            
             $keyboard = [
                 'inline_keyboard' => [
                     [
@@ -24,14 +25,23 @@ if (isset($update["message"])) {
                 ]
             ];
 
-            $reply = "مرحباً مهندس الصقور الجارحه 🦅\nتم تفعيل الأزرار بنجاح:";
-            
-            $url = $website . "/sendMessage?chat_id=" . $chatId . "&text=" . urlencode($reply) . "&reply_markup=" . json_encode($keyboard);
-            file_get_contents($url);
+            // إرسال البيانات باستخدام CURL (الطريقة الأضمن للأزرار)
+            $postData = [
+                'chat_id' => $chatId,
+                'text' => $reply,
+                'reply_markup' => json_encode($keyboard)
+            ];
+
+            $ch = curl_init("https://api.telegram.org/bot$botToken/sendMessage");
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+            curl_exec($ch);
+            curl_close($ch);
             exit;
         } else {
             // رد احتياطي للأدمن
-            file_get_contents($website . "/sendMessage?chat_id=$chatId&text=" . urlencode("مرحباً مهندس، استلمت: $text"));
+            $msg = "استلمت نصك: " . $text;
+            file_get_contents("https://api.telegram.org/bot$botToken/sendMessage?chat_id=$chatId&text=".urlencode($msg));
             exit;
         }
     }
